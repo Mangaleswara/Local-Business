@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anna Dosa Menu</title>
+    <style>
+        body {
+            background-image: url("background.avif");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed; 
+        }
+
+        .menu-container {
+            width: 80%;
+            margin: 20px auto;
+            font-family: sans-serif;
+            position: relative; 
+            background-color: rgba(255, 255, 255, 0.8); 
+            padding: 20px; 
+            border-radius: 10px; 
+        }
+        .menu-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .menu-description {
+            text-align: center;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .menu-list {
+            list-style: none;
+            padding: 0;
+        }
+        .menu-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .menu-item.first-row-item {
+            border-top: 1px solid #eee;
+        }
+        .item-container {
+            display: flex;
+            align-items: center;
+        }
+        .item-image {
+            margin-right: 15px;
+        }
+        .item-image img {
+            width: 120px;
+            height: 100px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+        .item-details {
+            flex-grow: 1;
+        }
+        .item-name {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .item-price {
+            color: green;
+            margin-bottom: 3px;
+        }
+        .item-special {
+            color: orange;
+            font-size: 0.9em;
+        }
+        .order-controls {
+            display: flex;
+            align-items: center;
+        }
+        .add-button, .quantity-button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+        }
+        .add-button:hover, .quantity-button:hover {
+            background-color: #45a049;
+        }
+        .quantity-display {
+            margin: 0 10px;
+            font-size: 1.1em;
+        }
+        .remove-button {
+            background-color: #f44336;
+        }
+        .remove-button:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Cart Styles */
+        .cart-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .cart-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+        }
+
+        .cart-count {
+            background-color: #f44336;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8em;
+        }
+
+        /* Cart Display */
+        .cart-display {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            width: 350px;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            display: none; /* Initially hidden */
+            z-index: 10;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-display h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .cart-item-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .cart-item-details {
+            flex-grow: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .cart-item-quantity {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .cart-item-price {
+            font-weight: bold;
+            color: green;
+        }
+
+        .cart-actions button {
+            padding: 5px 8px;
+            margin-left: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.8em;
+            background-color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .cart-actions button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .checkout-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-button:hover {
+            background-color: #0056b3;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <h2 class="menu-title">Anna Dosa Menu</h2>
+        <p class="menu-description">Fresh Vegetarian Delights</p>
+
+        <div class="cart-container" onclick="toggleCart()">
+            <img src="./shopping cart.png" alt="Shopping Cart" class="cart-icon">
+            <span class="cart-count" id="cart-item-count">0</span>
+        </div>
+
+        <div class="cart-display" id="cart-display">
+            <h4>Your Cart</h4>
+            <div id="cart-items">
+                <p class="empty-cart">Your cart is empty.</p>
+            </div>
+            <div class="cart-total" id="cart-total">Total: ₹0</div>
+            <button class="checkout-button" onclick="checkout()">Checkout</button>
+        </div>
+
+        <ul class="menu-list">
+            <li class="menu-item first-row-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./idli.jpeg" alt="Idli">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Idli</h3>
+                        <p class="item-price" data-price="15">₹15 each</p>
+                        <p class="item-special">Special: 4 for ₹50 (Save ₹10)</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./meduvada.jpeg" alt="Medu Vada">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Medu Vada</h3>
+                        <p class="item-price" data-price="15">₹15 each</p>
+                        <p class="item-special">Special: 4 for ₹50 (Save ₹10)</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./dalvada.jpeg" alt="Dal Vada">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Dal Vada</h3>
+                        <p class="item-price" data-price="15">₹15 each</p>
+                        <p class="item-special">Special: 4 for ₹50 (Save ₹10)</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./buttersada.jpeg" alt="Butter Sada Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Butter Sada Dosa</h3>
+                        <p class="item-price" data-price="60">₹60</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./sada_dosa.jpeg" alt="Sada Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Sada Dosa</h3>
+                        <p class="item-price" data-price="50">₹50</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./masala_dosa.jpeg" alt="Masala Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Masala Dosa</h3>
+                        <p class="item-price" data-price="70">₹70</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./uthappam.jpeg" alt="Uthappam">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Uthappam</h3>
+                        <p class="item-price" data-price="60">₹60</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./onion_uthappam.jpeg" alt="Onion Uthappam">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Onion Uthappam</h3>
+                        <p class="item-price" data-price="80">₹80</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./schzewan_dosa.jpeg" alt="Schezwan Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Schezwan Dosa</h3>
+                        <p class="item-price" data-price="90">₹90</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./chai.jpeg" alt="Chai">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Chai</h3>
+                        <p class="item-price" data-price="10">₹10</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./filter_coffee.jpeg" alt="Coffee">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Coffee</h3>
+                        <p class="item-price" data-price="15">₹15</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./bonda.jpeg" alt="Bonda">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Bonda</h3>
+                        <p class="item-price" data-price="15">₹15</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./water.jpeg" alt="Water">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Water</h3>
+                        <p class="item-price" data-price="10">₹10</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./butter_masala.jpeg" alt="Butter Masala Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Butter Masala Dosa</h3>
+                        <p class="item-price" data-price="100">₹100</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./masala_uthappam.jpeg" alt="Masala Uthappam">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Masala Uthappam</h3>
+                        <p class="item-price" data-price="90">₹90</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./ghee_dosa.jpeg" alt="Ghee Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Ghee Dosa</h3>
+                        <p class="item-price" data-price="110">₹110</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+            <li class="menu-item">
+                <div class="item-container">
+                    <div class="item-image">
+                        <img src="./podi_masala.jpeg" alt="Podi Masala Dosa">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-name">Podi Masala Dosa</h3>
+                        <p class="item-price" data-price="120">₹120</p>
+                    </div>
+                    <button class="add-button" onclick="addItem(this)">Add</button>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script>
+        let cart = [];
+        const serviceTimes = {
+            "Onion Uthappam": 11,
+            "Masala Dosa": 7.28, // 07:17 in mins
+            "Schezwan Dosa": 7,
+            "Podi Masala Dosa": 7,
+            "Uthappam": 7,
+            "Butter Masala Dosa": 7,
+            "Sada Dosa": 6.8, // 06:48 in mins
+            "Dal Vada": 4.43, // 04:26 in mins
+            "Idli": 3.38, // 03:23 in mins
+            "Medu Vada": 3.15, // 03:09 in mins
+            "Coffee": 3,
+            "Ghee Dosa": 3,
+            "Bonda": 1.33, // 01:20 in mins
+            "Water": 0.5,   // 00:30 in mins
+            "Chai": 0.25    // 00:15 in mins
+        };
+        const peakStartMorning = 8;
+        const peakEndMorning = 10;
+        const peakStartEvening = 18; // 6 PM
+        const peakEndEvening = 21;   // 9 PM
+        const peakMultiplier = 1.25;
+        const operatingHourStart = 8; // 8 AM
+        const operatingHourEnd = 21;   // 9 PM
+
+        function getCurrentHour() {
+            const now = new Date();
+            return now.getHours();
+        }
+
+        function getCurrentMinutes() {
+            const now = new Date();
+            return now.getMinutes();
+        }
+
+        function isPeakHour() {
+            const currentHour = getCurrentHour();
+            return (currentHour >= peakStartMorning && currentHour < peakEndMorning) || (currentHour >= peakStartEvening && currentHour < peakEndEvening);
+        }
+
+        function isOperatingHour() {
+            const currentHour = getCurrentHour();
+            return currentHour >= operatingHourStart && currentHour < operatingHourEnd;
+        }
+
+        function calculateEstimatedTime() {
+            let totalServiceTime = 0;
+            for (const item of cart) {
+                const baseTime = serviceTimes[item.name] || 5; // Default to 5 mins if not found
+                totalServiceTime += baseTime * item.quantity;
+            }
+
+            let maxServiceTime = 0;
+            for (const item of cart) {
+                const baseTime = serviceTimes[item.name] || 5;
+                maxServiceTime = Math.max(maxServiceTime, baseTime);
+            }
+            let estimatedTime = maxServiceTime;
+            if (isPeakHour()) {
+                estimatedTime *= peakMultiplier;
+            }
+
+            return Math.ceil(estimatedTime); // Round up to the nearest minute
+        }
+
+        function formatTime(hours, minutes) {
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            let formattedHours = hours % 12;
+            formattedHours = formattedHours ? formattedHours : 12; // the hour '0' should be '12'
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+            return `${formattedHours}:${formattedMinutes} ${ampm}`;
+        }
+
+        function addItem(addButton) {
+            const itemContainer = addButton.parentNode;
+            addButton.style.display = 'none';
+
+            const itemName = itemContainer.querySelector('.item-name').innerText;
+            const itemPrice = parseFloat(itemContainer.querySelector('.item-price').dataset.price);
+
+            const orderControls = document.createElement('div');
+            orderControls.classList.add('order-controls');
+
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('quantity-button', 'remove-button');
+            removeButton.innerText = '-';
+            removeButton.onclick = () => decreaseItem(orderControls, itemName, itemPrice);
+
+            const quantityDisplay = document.createElement('span');
+            quantityDisplay.classList.add('quantity-display');
+            quantityDisplay.innerText = '1';
+
+            const addButtonControl = document.createElement('button');
+            addButtonControl.classList.add('quantity-button');
+            addButtonControl.innerText = '+';
+            addButtonControl.onclick = () => increaseItem(orderControls, itemName, itemPrice);
+
+            orderControls.appendChild(removeButton);
+            orderControls.appendChild(quantityDisplay);
+            orderControls.appendChild(addButtonControl);
+
+            itemContainer.appendChild(orderControls);
+            updateCart(itemName, itemPrice, 1); // Add item to cart on first click
+        }
+
+        function increaseItem(controls, itemName, itemPrice) {
+            const quantityDisplay = controls.querySelector('.quantity-display');
+            let quantity = parseInt(quantityDisplay.innerText);
+            quantity++;
+            quantityDisplay.innerText = quantity;
+            updateCart(itemName, itemPrice, quantity);
+        }
+
+        function decreaseItem(controls, itemName, itemPrice) {
+            const quantityDisplay = controls.querySelector('.quantity-display');
+            let quantity = parseInt(quantityDisplay.innerText);
+            if (quantity > 1) {
+                quantity--;
+                quantityDisplay.innerText = quantity;
+                updateCart(itemName, itemPrice, quantity);
+            } else {
+                // If quantity is 1, revert to the "Add" button
+                const itemContainer = controls.parentNode;
+                const addButton = itemContainer.querySelector('.add-button');
+                addButton.style.display = 'block';
+                controls.remove();
+                removeItemFromCart(itemName); // Remove from cart when quantity becomes 0
+            }
+        }
+
+        function updateCart(itemName, itemPrice, quantity) {
+            const existingItemIndex = cart.findIndex(item => item.name === itemName);
+            let discountedPrice = itemPrice;
+
+            if ((itemName === "Idli" || itemName === "Medu Vada" || itemName === "Dal Vada") && quantity >= 4) {
+                let setsOfFour = Math.floor(quantity / 4);
+                let remaining = quantity % 4;
+                discountedPrice = (setsOfFour * 50 + remaining * itemPrice) / quantity;
+            }
+
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity = quantity;
+                cart[existingItemIndex].price = discountedPrice;
+            } else {
+                cart.push({ name: itemName, price: discountedPrice, quantity: quantity });
+            }
+            renderCart();
+        }
+
+        function removeItemFromCart(itemName) {
+            cart = cart.filter(item => item.name !== itemName);
+            renderCart();
+        }
+
+        function renderCart() {
+            const cartItemsDiv = document.getElementById('cart-items');
+            const cartTotalDiv = document.getElementById('cart-total');
+            const cartItemCountSpan = document.getElementById('cart-item-count');
+
+            cartItemsDiv.innerHTML = '';
+            let total = 0;
+            let itemCount = 0;
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
+            } else {
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    itemCount += item.quantity;
+
+                    const itemDisplay = document.createElement('div');
+                    itemDisplay.classList.add('cart-item-display');
+                    itemDisplay.innerHTML = `
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-quantity">Qty: ${item.quantity}</div>
+                        </div>
+                        <div class="cart-item-price">₹${itemTotal.toFixed(2)}</div>
+                        <div class="cart-actions">
+                            <button onclick="changeQuantity('${item.name}', ${item.quantity} - 1)">-</button>
+                            <button onclick="changeQuantity('${item.name}', ${item.quantity} + 1)">+</button>
+                            <button onclick="removeCartItem('${item.name}')">Remove</button>
+                        </div>
+                    `;
+                    cartItemsDiv.appendChild(itemDisplay);
+                });
+            }
+
+            cartTotalDiv.innerText = `Total: ₹${total.toFixed(2)}`;
+            cartItemCountSpan.innerText = itemCount;
+        }
+        function toggleCart() {
+            const cartDisplay = document.getElementById('cart-display');
+            cartDisplay.style.display = cartDisplay.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function removeCartItem(itemName) {
+            cart = cart.filter(item => item.name !== itemName);
+            // Re-enable the "Add" button on the menu
+            const menuItem = Array.from(document.querySelectorAll('.item-container')).find(container => {
+                return container.querySelector('.item-name').innerText === itemName;
+            });
+            if (menuItem) {
+                const addButton = menuItem.querySelector('.add-button');
+                const orderControls = menuItem.querySelector('.order-controls');
+                if (addButton) {
+                    addButton.style.display = 'block';
+                }
+                if (orderControls) {
+                    orderControls.remove();
+                }
+            }
+            renderCart();
+        }
+
+        function changeQuantity(itemName, newQuantity) {
+            if (newQuantity >= 0) {
+                const itemIndex = cart.findIndex(item => item.name === itemName);
+                if (itemIndex > -1) {
+                    // Instead of querying the DOM again, we use the price stored in the cart array
+                    const itemPrice = cart[itemIndex].price;
+                    updateCart(itemName, itemPrice, newQuantity);
+                }
+            }
+        }
+
+        function checkout() {
+            if (cart.length > 0) {
+                if (isOperatingHour()) {
+                    const now = new Date();
+                    const orderHour = now.getHours();
+                    const orderMinute = now.getMinutes();
+                    const estimatedTimeInMinutes = calculateEstimatedTime();
+                    const collectionTime = new Date(now.getTime() + estimatedTimeInMinutes * 60000); // Add estimated time in milliseconds
+                    const collectionHour = collectionTime.getHours();
+                    const collectionMinute = collectionTime.getMinutes();
+
+                    const formattedOrderTime = formatTime(orderHour, orderMinute);
+                    const formattedCollectionTime = formatTime(collectionHour, collectionMinute);
+
+                    document.getElementById('cart-items').innerHTML = `<p>Your order placed at ${formattedOrderTime} will be ready for collection at approximately ${formattedCollectionTime}.</p>`;
+                    document.getElementById('cart-total').innerText = "";
+                    const checkoutButton = document.querySelector('.checkout-button');
+                    if (checkoutButton) {
+                        checkoutButton.style.display = 'none';
+                    }
+                    alert(`Your order placed at ${formattedOrderTime} will be ready for collection at approximately ${formattedCollectionTime}.`);
+                    // In a real application, you would proceed to collect payment and delivery details here.
+                } else {
+                    const formattedOperatingStartHour = operatingHourStart % 12 || 12;
+                    const formattedOperatingEndHour = operatingHourEnd % 12 || 12;
+                    const operatingStartAMPM = operatingHourStart < 12 ? 'AM' : 'PM';
+                    const operatingEndAMPM = operatingHourEnd < 12 ? 'AM' : 'PM';
+
+                    alert(`Sorry, we are currently closed. Our operating hours are from ${formattedOperatingStartHour}:00 ${operatingStartAMPM} to ${formattedOperatingEndHour}:00 ${operatingEndAMPM}. You cannot place an order at this time.`);
+                }
+            } else {
+                alert("Your cart is empty. Please add items to checkout.");
+            }
+        }
+
+        // Initialize the cart display
+        renderCart();
+    </script>
+</body>
+</html>

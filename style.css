@@ -1,0 +1,110 @@
+body {
+    font-family: sans-serif;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f8f8f8;
+}
+
+.menu-container {
+    max-width: 800px; /* Increased max-width to accommodate the first row */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-title {
+    color: #4CAF50;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50;
+    margin-bottom: 15px;
+}
+
+.menu-description {
+    text-align: left;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.menu-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu-item {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.first-row-item {
+    border-bottom: none; /* Remove bottom border for items in the first row */
+}
+
+.first-row-item .item-container {
+    display: flex;
+    flex-direction: row; /* Arrange items horizontally */
+    align-items: flex-start;
+    margin-bottom: 20px; /* Add some space below the first row */
+}
+
+.first-row-item .item-container .item-image {
+    margin-right: 20px; /* Add more space between images in the first row */
+}
+
+.first-row-item .item-container .item-details {
+    flex-grow: 1;
+}
+
+.item-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.item-image {
+    margin-right: 10px;
+}
+
+.item-image img {
+    border-radius: 8px;
+    max-width: 120px;
+    height: auto;
+}
+
+.item-details {
+    text-align: left;
+    flex-grow: 1;
+}
+
+.item-name {
+    color: #4CAF50;
+    margin-bottom: 5px;
+}
+
+.item-price {
+    margin: 0;
+}
+
+.item-special {
+    color: #2E7D32;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Style for items after the first row to go back to single column */
+.menu-item:not(.first-row-item) .item-container {
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-start;
+}
+
+.menu-item:not(.first-row-item) .item-container .item-image {
+    margin-bottom: 10px; /* Add space below image for single column layout */
+    margin-right: 0; /* Reset right margin */
+}
